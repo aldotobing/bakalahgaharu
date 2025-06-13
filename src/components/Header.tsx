@@ -80,7 +80,52 @@ const Header: React.FC<HeaderProps> = ({ t, currentLanguage, onLanguageChange, i
           </nav>
 
           {/* Language Selector & Mobile Menu */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 sm:space-x-4">
+            {/* Always visible language selector on mobile */}
+            <div className="relative md:hidden" ref={langMenuRef}>
+              <button
+                onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-lg bg-amber-50 hover:bg-amber-100 transition-colors duration-200 text-amber-700 text-sm sm:text-base"
+              >
+                <ReactCountryFlag
+                  countryCode={countryCodes[currentLanguage]}
+                  svg
+                  className="w-4 h-4 sm:w-5 sm:h-5 rounded-sm overflow-hidden"
+                />
+                <span className="font-medium">{currentLanguage.toUpperCase()}</span>
+                <ChevronDown className={`w-3 h-3 sm:w-4 sm:h-4 transition-transform ${isLangMenuOpen ? 'rotate-180' : ''}`} />
+              </button>
+              
+              {isLangMenuOpen && (
+                <div className="absolute right-0 mt-2 w-36 bg-white/95 backdrop-blur-sm rounded-lg shadow-xl border border-gray-200 overflow-hidden z-50">
+                  {languages.map((lang) => (
+                    <button
+                      key={lang.code}
+                      onClick={() => {
+                        onLanguageChange(lang.code);
+                        setIsLangMenuOpen(false);
+                      }}
+                      className={`w-full px-4 py-2 text-left text-sm font-medium ${
+                        currentLanguage === lang.code 
+                          ? 'bg-amber-50 text-amber-700' 
+                          : 'text-gray-700 hover:bg-gray-50'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <ReactCountryFlag
+                          countryCode={countryCodes[lang.code]}
+                          svg
+                          className="w-4 h-4 rounded-sm overflow-hidden"
+                        />
+                        <span>{lang.name}</span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Desktop language selector */}
             <div className="hidden md:block relative" ref={langMenuRef}>
               <button
                 onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
@@ -122,13 +167,13 @@ const Header: React.FC<HeaderProps> = ({ t, currentLanguage, onLanguageChange, i
             
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden p-2.5 rounded-lg hover:bg-amber-50 text-amber-700 transition-colors"
+              className="md:hidden p-2 rounded-lg hover:bg-amber-50 text-amber-700 transition-colors"
               aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
             >
               {isMenuOpen ? (
-                <X className="w-6 h-6" strokeWidth={2.5} />
+                <X className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={2.5} />
               ) : (
-                <Menu className="w-6 h-6" strokeWidth={2.5} />
+                <Menu className="w-5 h-5 sm:w-6 sm:h-6" strokeWidth={2.5} />
               )}
             </button>
           </div>
