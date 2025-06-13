@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://bakalahgaharu.pages.dev/sitemap.xml
+
+# Crawl-delay: 10
+# Uncomment the above line if you want to limit crawl rate (in seconds)
