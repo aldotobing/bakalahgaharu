@@ -222,9 +222,9 @@ const Contact: React.FC<ContactProps> = ({ t, isRTL }) => {
                     className="text-gray-600"
                     variants={fadeInUp}
                   >
-                    JL. IR JUANDA NO 31<br />
-                    Probolinggo, East Java<br />
-                    Indonesia
+                    Jl. IR. H. Juanda No.31<br />
+                    Patokan, Kec. Kraksaan<br />
+                    Kabupaten Probolinggo, Jawa Timur 67282
                   </motion.p>
                 </div>
               </motion.div>
