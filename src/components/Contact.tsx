@@ -241,12 +241,13 @@ const Contact: React.FC<ContactProps> = ({ t, isRTL }) => {
               transition={{ type: 'spring', stiffness: 300 }}
             >
               <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3957.6744900401023!2d113.21643231530826!3d-7.27588899474974!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dd7f9f9c5f5f5f5%3A0x5f5f5f5f5f5f5f5f!2sJl.%20Ir%20Juanda%20No.31%2C%20Kec.%20Kademangan%2C%20Kota%20Probolinggo%2C%20Jawa%20Timur%2067217!5e0!3m2!1sen!2sid!4v1620000000000!5m2!1sen!2sid"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3955.888805123419!2d113.414281!3d-7.7596571!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2dd70050ba234187%3A0x6a01a95806f5798e!2sJl.%20IR.%20H.%20Juanda%20No.31%2C%20Patokan%2C%20Kec.%20Kraksaan%2C%20Kabupaten%20Probolinggo%2C%20Jawa%20Timur%2067282!5e0!3m2!1sen!2sid"
                 width="100%"
                 height="100%"
                 style={{ border: 0 }}
                 allowFullScreen
                 loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
                 title="Our Location"
                 className="rounded-lg"
               />
