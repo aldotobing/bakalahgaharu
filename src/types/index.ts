@@ -1,5 +1,7 @@
+export type LanguageCode = 'en' | 'id' | 'ar';
+
 export interface Language {
-  code: string;
+  code: LanguageCode;
   name: string;
   flag: string;
 }
@@ -35,7 +37,6 @@ export interface Translation {
     location: string;
     description: string;
     features: string[];
-    craftsmanship: string;
     customOrder: {
       title: string;
       subtitle: string;
@@ -77,9 +78,20 @@ export interface Translation {
     email: string;
     phone: string;
     address: string;
+    workingHours: string;
+    emailUs: string;
+    callUs: string;
+    visitUs: string;
+    socialMedia: string;
+    getDirections: string;
+    info: string;
     whatsapp: {
-      title: string;
-      description: string;
+      defaultMessage: string;
+      name: string;
+      email: string;
+      message: string;
+      lookingForward: string;
+      sentFrom: string;
     };
     form: {
       name: string;
@@ -90,6 +102,21 @@ export interface Translation {
   };
   footer: {
     company: string;
+    tagline: string;
+    description: string;
+    quickLinks: string;
+    contactInfo: string;
+    followUs: string;
     rights: string;
+    madeWith: string;
+    inIndonesia: string;
+    phone: string;
+    language: string;
+    copyright: string;
+    socialMedia: {
+      facebook: string;
+      instagram: string;
+      twitter: string;
+    };
   };
 }

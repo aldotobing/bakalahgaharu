@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { ChevronDown } from 'lucide-react';
 import ReactCountryFlag from 'react-country-flag';
 import { languages } from '../data/translations';
+import { LanguageCode } from '../types';
 
 const countryCodes: Record<string, string> = {
   en: 'GB',
@@ -10,8 +11,8 @@ const countryCodes: Record<string, string> = {
 };
 
 interface LanguageSelectorProps {
-  currentLanguage: string;
-  onLanguageChange: (lang: string) => void;
+  currentLanguage: LanguageCode;
+  onLanguageChange: (lang: LanguageCode) => void;
 }
 
 const LanguageSelector: React.FC<LanguageSelectorProps> = ({

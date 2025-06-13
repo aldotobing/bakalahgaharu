@@ -79,7 +79,7 @@ function App() {
         />
         <main className="flex-grow">
           <Hero t={t} isRTL={isRTL} currentLanguage={currentLanguage} />
-          <About t={t} isRTL={isRTL} />
+          <About t={t} isRTL={isRTL} currentLanguage={currentLanguage} />
           <Products t={t} isRTL={isRTL} currentLanguage={currentLanguage} />
           <Contact t={t} isRTL={isRTL} currentLanguage={currentLanguage} />
         </main>

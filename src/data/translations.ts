@@ -29,10 +29,8 @@ export const translations: Record<string, Translation> = {
         'Sustainable Harvesting',
         'International Export Standards',
         'Community Partnership',
-        'Environmental Responsibility',
-        'Traditional Craftsmanship'
+        'Environmental Responsibility'
       ],
-      craftsmanship: 'Preserving centuries-old techniques with modern quality standards',
       customOrder: {
         title: 'Looking for custom orders or bulk quantities?',
         subtitle: 'Quick Contact via WhatsApp',
@@ -74,9 +72,20 @@ export const translations: Record<string, Translation> = {
       email: 'Email',
       phone: 'Phone',
       address: 'Address',
+      workingHours: 'Monday - Friday: 9:00 - 17:00 WIB',
+      emailUs: 'Email Us',
+      callUs: 'Call Us',
+      visitUs: 'Visit Us',
+      socialMedia: 'Follow Us',
+      getDirections: 'Get Directions',
+      info: 'Contact Information',
       whatsapp: {
-        title: 'Quick Contact via WhatsApp',
-        description: 'Get in touch with us directly for any inquiries or quotes'
+        defaultMessage: "Hello! I'm interested in your products and would like to get more information. Could you please provide details about your offerings and pricing?",
+        name: 'Name',
+        email: 'Email',
+        message: 'Message',
+        lookingForward: 'Looking forward to your response!',
+        sentFrom: 'Sent from bakalahgaharu.com'
       },
       form: {
         name: 'Your Name',
@@ -87,7 +96,22 @@ export const translations: Record<string, Translation> = {
     },
     footer: {
       company: 'PT Bakalah Gaharu Nusantara',
-      rights: 'All rights reserved.'
+      tagline: 'Premium Agarwood Exporter',
+      description: 'Your trusted partner for high-quality agarwood products, sustainably sourced from East Java, Indonesia.',
+      quickLinks: 'Quick Links',
+      contactInfo: 'Contact Info',
+      followUs: 'Follow Us',
+      rights: 'All rights reserved.',
+      madeWith: 'Made with',
+      inIndonesia: 'in Indonesia',
+      phone: '+62 85124776840',
+      language: 'Language',
+      copyright: '©',
+      socialMedia: {
+        facebook: 'Visit our Facebook',
+        instagram: 'Follow us on Instagram',
+        twitter: 'Follow us on Twitter'
+      }
     }
   },
   id: {
@@ -112,10 +136,8 @@ export const translations: Record<string, Translation> = {
         'Pemanenan Berkelanjutan',
         'Standar Ekspor Internasional',
         'Kemitraan Komunitas',
-        'Tanggung Jawab Lingkungan',
-        'Kerajinan Tradisional'
+        'Tanggung Jawab Lingkungan'
       ],
-      craftsmanship: 'Melestarikan teknik kuno dengan standar kualitas modern',
       customOrder: {
         title: 'Mencari pesanan khusus atau jumlah besar?',
         subtitle: 'Hubungi Cepat melalui WhatsApp',
@@ -153,13 +175,24 @@ export const translations: Record<string, Translation> = {
     },
     contact: {
       title: 'Hubungi Kami',
-      subtitle: 'Siap untuk memesan atau ada pertanyaan? Hubungi tim kami',
+      subtitle: 'Siap memesan atau ada pertanyaan? Hubungi tim kami',
       email: 'Email',
       phone: 'Telepon',
       address: 'Alamat',
+      workingHours: 'Senin - Jumat: 09:00 - 17:00 WIB',
+      emailUs: 'Email Kami',
+      callUs: 'Telepon Kami',
+      visitUs: 'Kunjungi Kami',
+      socialMedia: 'Ikuti Kami',
+      getDirections: 'Dapatkan Petunjuk',
+      info: 'Informasi Kontak',
       whatsapp: {
-        title: 'Hubungi Langsung via WhatsApp',
-        description: 'Hubungi kami langsung untuk pertanyaan atau penawaran'
+        defaultMessage: 'Halo! Saya tertarik dengan produk Anda dan ingin mendapatkan informasi lebih lanjut. Bisakah Anda memberikan detail tentang penawaran dan harga?',
+        name: 'Nama',
+        email: 'Email',
+        message: 'Pesan',
+        lookingForward: 'Menunggu kabar baik dari Anda!',
+        sentFrom: 'Dikirim dari bakalahgaharu.com'
       },
       form: {
         name: 'Nama Anda',
@@ -170,7 +203,22 @@ export const translations: Record<string, Translation> = {
     },
     footer: {
       company: 'PT Bakalah Gaharu Nusantara',
-      rights: 'Semua hak dilindungi.'
+      tagline: 'Eksportir Gaharu Premium',
+      description: 'Mitra terpercaya untuk produk gaharu berkualitas tinggi, dipanen secara berkelanjutan dari Jawa Timur, Indonesia.',
+      quickLinks: 'Tautan Cepat',
+      contactInfo: 'Info Kontak',
+      followUs: 'Ikuti Kami',
+      rights: 'Hak Cipta Dilindungi.',
+      madeWith: 'Dibuat dengan',
+      inIndonesia: 'di Indonesia',
+      phone: '+62 85124776840',
+      language: 'Bahasa',
+      copyright: '©',
+      socialMedia: {
+        facebook: 'Kunjungi Facebook kami',
+        instagram: 'Ikuti kami di Instagram',
+        twitter: 'Ikuti kami di Twitter'
+      }
     }
   },
   ar: {
@@ -191,14 +239,12 @@ export const translations: Record<string, Translation> = {
       location: 'تقع في بروبولينجو، جاوة الشرقية',
       description: 'شركة PT Bakalah Gaharu Nusantara هي مصدر رائد لمنتجات العود الفاخرة من إندونيسيا. نحن ملتزمون بممارسات الحصاد المستدامة مع تقديم أجود أنواع العود للأسواق الدولية.',
       features: [
-        'ضمان الجودة الفاخرة',
-        'الحصاد المستدام',
+        'ضمان الجودة الممتازة',
+        'حصاد مستدام',
         'معايير التصدير الدولية',
-        'شراكة المجتمع',
-        'المسؤولية البيئية',
-        'الحرفية التقليدية'
+        'شراكة مجتمعية',
+        'المسؤولية البيئية'
       ],
-      craftsmanship: 'الحفاظ على الحرفية التقليدية بمعايير الجودة الحديثة',
       customOrder: {
         title: 'هل تبحث عن طلبات مخصصة أو كميات كبيرة؟',
         subtitle: 'اتصل بنا سريعًا عبر واتساب',
@@ -236,13 +282,24 @@ export const translations: Record<string, Translation> = {
     },
     contact: {
       title: 'اتصل بنا',
-      subtitle: 'مستعد لتقديم طلب أو لديك أسئلة؟ تواصل مع فريقنا',
+      subtitle: 'هل أنت مستعد للطلب أو لديك استفسارات؟ تواصل مع فريقنا',
       email: 'البريد الإلكتروني',
       phone: 'الهاتف',
       address: 'العنوان',
+      workingHours: 'الاثنين - الجمعة: 9:00 - 17:00 بتوقيت غرب إندونيسيا',
+      emailUs: 'راسلنا عبر البريد',
+      callUs: 'اتصل بنا',
+      visitUs: 'زورنا',
+      socialMedia: 'تابعنا',
+      getDirections: 'احصل على الاتجاهات',
+      info: 'معلومات الاتصال',
       whatsapp: {
-        title: 'اتصل بنا مباشرة عبر واتساب',
-        description: 'تواصل معنا مباشرة لأي استفسارات أو عروض أسعار'
+        defaultMessage: 'مرحباً! أنا مهتم بمنتجاتكم وأود الحصول على مزيد من المعلومات. هل يمكنكم تقديم تفاصيل عن عروضكم وأسعاركم؟',
+        name: 'الاسم',
+        email: 'البريد الإلكتروني',
+        message: 'الرسالة',
+        lookingForward: 'نتطلع لردكم!',
+        sentFrom: 'مرسل من bakalahgaharu.com'
       },
       form: {
         name: 'اسمك',
@@ -252,8 +309,23 @@ export const translations: Record<string, Translation> = {
       }
     },
     footer: {
-      company: 'PT Bakalah Gaharu Nusantara',
-      rights: 'جميع الحقوق محفوظة.'
+      company: 'شركة بقالة عود النوسانتارا',
+      tagline: 'مصدر خشب العود الفاخر',
+      description: 'شريكك الموثوق لمنتجات خشب العود عالية الجودة، مصدرها مستدام من شرق جاوة، إندونيسيا.',
+      quickLinks: 'روابط سريعة',
+      contactInfo: 'معلومات الاتصال',
+      followUs: 'تابعنا',
+      rights: 'جميع الحقوق محفوظة.',
+      madeWith: 'مصنوع بـ',
+      inIndonesia: 'في إندونيسيا',
+      phone: '٦٢ ٨٥١٢٤٧٧٦٨٤٠+',
+      language: 'اللغة',
+      copyright: '©',
+      socialMedia: {
+        facebook: 'زوروا صفحتنا على فيسبوك',
+        instagram: 'تابعونا على إنستغرام',
+        twitter: 'تابعونا على تويتر'
+      }
     }
   }
 };

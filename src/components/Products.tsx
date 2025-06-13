@@ -125,7 +125,6 @@ const Products: React.FC<ProductsProps> = ({ t, isRTL, currentLanguage }) => {
             </motion.div>
           ))}
         </motion.div>
-
         {/* Call to action */}
         <motion.div 
           className="text-center mt-12"
@@ -162,17 +161,13 @@ const Products: React.FC<ProductsProps> = ({ t, isRTL, currentLanguage }) => {
               whileHover="hover"
               whileTap="tap"
             >
-              <WhatsAppButton
-                message={messages.custom}
-                variant="inline"
-                size="md"
-                text={t.products.customOrder.whatsappButton}
-              />
             </motion.div>
           </motion.div>
         </motion.div>
       </div>
+      
     </motion.section>
+    
   );
 };
 

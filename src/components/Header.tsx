@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Menu, X, ChevronDown } from 'lucide-react';
 import ReactCountryFlag from 'react-country-flag';
-import { Translation } from '../types';
+import { Translation, LanguageCode } from '../types';
 import { languages } from '../data/translations';
 
 const countryCodes: Record<string, string> = {
@@ -12,8 +12,8 @@ const countryCodes: Record<string, string> = {
 
 interface HeaderProps {
   t: Translation;
-  currentLanguage: string;
-  onLanguageChange: (lang: string) => void;
+  currentLanguage: LanguageCode;
+  onLanguageChange: (lang: LanguageCode) => void;
   isRTL: boolean;
 }
 
