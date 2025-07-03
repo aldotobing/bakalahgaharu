@@ -1,16 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
-        http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+<urlset 
+  xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml"
+  xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+                      http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+
   <!-- Homepage -->
   <url>
     <loc>https://bakalahgaharu.pages.dev/</loc>
     <lastmod>2025-06-13</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://bakalahgaharu.pages.dev/" />
+    <xhtml:link rel="alternate" hreflang="id" href="https://bakalahgaharu.pages.dev/id/" />
+    <xhtml:link rel="alternate" hreflang="ar" href="https://bakalahgaharu.pages.dev/ar/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://bakalahgaharu.pages.dev/" />
   </url>
-  
+
   <!-- About Page -->
   <url>
     <loc>https://bakalahgaharu.pages.dev/about</loc>
@@ -18,7 +25,7 @@
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
-  
+
   <!-- Products Page -->
   <url>
     <loc>https://bakalahgaharu.pages.dev/products</loc>
@@ -26,22 +33,23 @@
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
-  
-  <!-- Individual Product Pages -->
-  <!-- Note: In a production environment, these should be dynamically generated from your products data -->
+
+  <!-- Product: Agarwood Chips -->
   <url>
     <loc>https://bakalahgaharu.pages.dev/products/agarwood-chips</loc>
     <lastmod>2025-06-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
+
+  <!-- Product: Agarwood Oil -->
   <url>
     <loc>https://bakalahgaharu.pages.dev/products/agarwood-oil</loc>
     <lastmod>2025-06-13</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
-  
+
   <!-- Contact Page -->
   <url>
     <loc>https://bakalahgaharu.pages.dev/contact</loc>
@@ -49,33 +57,5 @@
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
-  
-  <!-- Language Versions (hreflang) -->
-  <url>
-    <loc>https://bakalahgaharu.pages.dev/</loc>
-    <xhtml:link 
-      rel="alternate" 
-      hreflang="en" 
-      href="https://bakalahgaharu.pages.dev/"
-      xmlns:xhtml="http://www.w3.org/1999/xhtml" 
-    />
-    <xhtml:link 
-      rel="alternate" 
-      hreflang="id" 
-      href="https://bakalahgaharu.pages.dev/id/"
-      xmlns:xhtml="http://www.w3.org/1999/xhtml" 
-    />
-    <xhtml:link 
-      rel="alternate" 
-      hreflang="ar" 
-      href="https://bakalahgaharu.pages.dev/ar/"
-      xmlns:xhtml="http://www.w3.org/1999/xhtml" 
-    />
-    <xhtml:link 
-      rel="alternate" 
-      hreflang="x-default" 
-      href="https://bakalahgaharu.pages.dev/"
-      xmlns:xhtml="http://www.w3.org/1999/xhtml" 
-    />
-  </url>
+
 </urlset>
