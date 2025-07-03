@@ -1,4 +1,4 @@
-export type LanguageCode = 'en' | 'id' | 'ar';
+export type LanguageCode = "en" | "id" | "ar";
 
 export interface Language {
   code: LanguageCode;
@@ -6,17 +6,37 @@ export interface Language {
   flag: string;
 }
 
+export interface PriceOption {
+  price: number;
+  size: string;
+  unit: string;
+}
+
 export interface Product {
   id: string;
-  name: string;
+  name: {
+    en: string;
+    id: string;
+    ar: string;
+  };
   grade: string;
   colors: string[];
-  price: number;
+  prices?: PriceOption[]; // For products with multiple price options
+  price?: number; // For backward compatibility with single-price products
+  unit?: string; // Unit for single-price products (e.g., 'kg', 'g', 'ml')
   currency: string;
-  description: string;
-  image: string;  // This remains for backward compatibility
+  description: {
+    en: string;
+    id: string;
+    ar: string;
+  };
+  image: string; // This remains for backward compatibility
   images?: string[]; // New array of image URLs
-  badge?: string;
+  badge?: {
+    en: string;
+    id: string;
+    ar: string;
+  };
 }
 
 export interface Translation {
