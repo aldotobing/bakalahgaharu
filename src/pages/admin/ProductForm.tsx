@@ -192,7 +192,7 @@ const ProductForm: React.FC = () => {
       
       Indonesian Text: "${text.trim()}"`;
       
-      const response = await fetch('/api/cloudflare/v1/c3b9fa9ebddb0361afa9f84815831195/cloudflare/workers-ai/@cf/meta/llama-3.1-8b-instruct', {
+      const response = await fetch('https://gateway.ai.cloudflare.com/v1/c3b9fa9ebddb0361afa9f84815831195/cloudflare/workers-ai/@cf/meta/llama-3.1-8b-instruct', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${import.meta.env.VITE_CF_TOKEN}`,
