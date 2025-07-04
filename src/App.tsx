@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { AnimatePresence } from 'framer-motion';
+import { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import Hero from './components/Hero';
 import About from './components/About';
@@ -7,8 +7,14 @@ import Products from './components/Products';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
 import { useLanguage } from './hooks/useLanguage';
+import { AuthProvider } from './contexts/AuthContext';
+import Login from './pages/admin/Login';
+import Dashboard from './pages/admin/Dashboard';
+import AdminProducts from './pages/admin/Products';
+import ProductForm from './pages/admin/ProductForm';
+import ProtectedRoute from './components/ProtectedRoute';
 
-function App() {
+const MainContent = () => {
   const { currentLanguage, setCurrentLanguage, t, isRTL } = useLanguage();
 
   useEffect(() => {
@@ -69,28 +75,53 @@ function App() {
   }, [currentLanguage, isRTL]);
 
   return (
-    <AnimatePresence mode="wait">
-      <div className={`min-h-screen flex flex-col ${isRTL ? 'rtl' : 'ltr'}`} dir={isRTL ? 'rtl' : 'ltr'}>
-        <Header
-          t={t}
-          currentLanguage={currentLanguage}
-          onLanguageChange={setCurrentLanguage}
-          isRTL={isRTL}
-        />
-        <main className="flex-grow">
+    <div className={`min-h-screen flex flex-col ${isRTL ? 'rtl' : 'ltr'}`} dir={isRTL ? 'rtl' : 'ltr'}>
+      <Header
+        t={t}
+        currentLanguage={currentLanguage}
+        onLanguageChange={setCurrentLanguage}
+        isRTL={isRTL}
+      />
+      <main className="flex-grow">
+        <div key="hero">
           <Hero t={t} isRTL={isRTL} currentLanguage={currentLanguage} />
+        </div>
+        <div key="about">
           <About t={t} isRTL={isRTL} currentLanguage={currentLanguage} />
+        </div>
+        <div key="products">
           <Products t={t} isRTL={isRTL} currentLanguage={currentLanguage} />
+        </div>
+        <div key="contact">
           <Contact t={t} isRTL={isRTL} currentLanguage={currentLanguage} />
-        </main>
-        <Footer
-          t={t}
-          currentLanguage={currentLanguage}
-          onLanguageChange={setCurrentLanguage}
-          isRTL={isRTL}
-        />
-      </div>
-    </AnimatePresence>
+        </div>
+      </main>
+      <Footer
+        t={t}
+        currentLanguage={currentLanguage}
+        onLanguageChange={setCurrentLanguage}
+        isRTL={isRTL}
+      />
+    </div>
+  );
+};
+
+function App() {
+  return (
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route path="/admin/login" element={<Login />} />
+          <Route path="/admin" element={<ProtectedRoute />}>
+                        <Route index element={<Dashboard />} />
+            <Route path="products" element={<AdminProducts />} />
+            <Route path="products/new" element={<ProductForm />} />
+            <Route path="products/edit/:id" element={<ProductForm />} />
+          </Route>
+          <Route path="/*" element={<MainContent />} />
+        </Routes>
+      </Router>
+    </AuthProvider>
   );
 }
 

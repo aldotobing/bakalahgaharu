@@ -33,8 +33,38 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const messages =
     whatsappMessages[currentLanguage as keyof typeof whatsappMessages];
 
-  // Use images array if available, otherwise fallback to single image
-  const productImages = product.images || [product.image];
+  // Helper function to get text based on current language
+  const getText = (text: { [key: string]: string } | string): string => {
+    if (!text) return "";
+    if (typeof text === "string") return text;
+    return text[currentLanguage as keyof typeof text] || text.en || "";
+  };
+
+  // Format price based on currency and language
+  const formatPrice = (price: number | string, currency: string = "USD") => {
+    const priceNumber = typeof price === "string" ? parseFloat(price) : price;
+    if (isNaN(priceNumber)) return "";
+
+    return new Intl.NumberFormat(currentLanguage === "ar" ? "ar-SA" : "en-US", {
+      style: "currency",
+      currency: currency || "USD",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(priceNumber);
+  };
+
+  const productImages =
+    product.images && product.images.length > 0
+      ? product.images
+      : product.image
+      ? [product.image]
+      : ["/placeholder-product.jpg"];
+
+  const safePrices = Array.isArray(product.prices) ? product.prices : [];
+  const displayPrice = safePrices[0]
+    ? formatPrice(safePrices[0].price, product.currency || "USD")
+    : "";
+
   const shareProduct = async (platform?: string) => {
     const productUrl = `${window.location.origin}/products/${product.id}`;
     const priceText = product.prices
@@ -125,25 +155,6 @@ const ProductCard: React.FC<ProductCardProps> = ({
     },
   };
 
-  const modalVariants: Variants = {
-    hidden: { opacity: 0, scale: 0.9 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      transition: {
-        duration: 0.3,
-        ease: [0.4, 0, 0.2, 1],
-      },
-    },
-    exit: {
-      opacity: 0,
-      scale: 0.9,
-      transition: {
-        duration: 0.2,
-      },
-    },
-  };
-
   return (
     <>
       <motion.div
@@ -155,27 +166,45 @@ const ProductCard: React.FC<ProductCardProps> = ({
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        {/* Badge */}{" "}
+        {/* Badge */}
         {product.badge && (
-          <motion.div
-            className="absolute top-4 left-4 z-10 bg-amber-600 text-white px-3 py-1 rounded-full text-sm font-semibold"
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.2, type: "spring", stiffness: 300 }}
+          <div
+            className={`absolute top-4 right-4 ${
+              (typeof product.badge === "string" && product.badge === "New") ||
+              (typeof product.badge === "object" && product.badge?.en === "New")
+                ? "bg-green-500"
+                : (typeof product.badge === "string" &&
+                    product.badge === "Limited") ||
+                  (typeof product.badge === "object" &&
+                    product.badge?.en === "Limited")
+                ? "bg-red-500"
+                : "bg-amber-500"
+            } text-white px-3 py-1 rounded-full text-xs font-semibold z-10`}
           >
-            {product.badge[currentLanguage as keyof typeof product.badge]}
-          </motion.div>
+            <span className="text-xs font-semibold">
+              {typeof product.badge === "string"
+                ? product.badge
+                : getText(product.badge)}
+            </span>
+          </div>
         )}
         {/* Image */}
         <div className="relative h-64 overflow-hidden">
           <motion.div className="w-full h-full" variants={imageHoverVariants}>
             <img
-              src={product.image}
-              alt={product.name[currentLanguage as keyof typeof product.name]}
+              src={product.image || "/placeholder-product.jpg"}
+              alt={getText(product.name || { en: "Product image" })}
               className="w-full h-full object-cover"
               loading="lazy"
               width="400"
               height="300"
+              onError={(e) => {
+                // Fallback to placeholder if image fails to load
+                const target = e.target as HTMLImageElement;
+                if (target.src !== "/placeholder-product.jpg") {
+                  target.src = "/placeholder-product.jpg";
+                }
+              }}
             />
           </motion.div>
           <motion.div
@@ -228,7 +257,13 @@ const ProductCard: React.FC<ProductCardProps> = ({
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
           >
-            {product.name[currentLanguage as keyof typeof product.name]}
+            {getText(
+              product.name || {
+                en: "Untitled Product",
+                id: "Produk Tanpa Judul",
+                ar: "منتج بدون عنوان",
+              }
+            )}
           </motion.h3>
 
           <motion.div
@@ -292,26 +327,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
             transition={{ delay: 0.5 }}
           >
             <div>
-              {product.prices ? (
-                <div className="flex flex-col">
-                  <span className="text-lg font-bold text-amber-600">
-                    From ${Math.min(...product.prices.map((p) => p.price))}{" "}
-                    {product.currency}
-                  </span>
-                  <span className="text-sm text-gray-500">
-                    {product.prices.map((p) => `${p.size}${p.unit}`).join(", ")}
-                  </span>
-                </div>
-              ) : (
-                <>
-                  <span className="text-2xl font-bold text-amber-600">
-                    ${product.price}
-                  </span>
-                  <span className="text-gray-500 ml-1">
-                    {product.currency}/{product.unit}
-                  </span>
-                </>
-              )}
+              <span className="text-lg font-bold text-amber-600">
+                {displayPrice}
+              </span>
             </div>
             <div className="flex items-center space-x-1">
               {[...Array(5)].map((_, i) => (
@@ -346,28 +364,22 @@ const ProductCard: React.FC<ProductCardProps> = ({
         </div>
       </motion.div>
 
-      {/* Modal */}
+      {/* Modal Portal */}
       <AnimatePresence>
         {showModal && (
           <motion.div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4"
-            initial={{ backgroundColor: "rgba(0,0,0,0)" }}
-            animate={{ backgroundColor: "rgba(0,0,0,0.5)" }}
-            exit={{ backgroundColor: "rgba(0,0,0,0)" }}
+            className="fixed inset-0 bg-stone-900/70 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             onClick={() => setShowModal(false)}
-            role="dialog"
-            aria-modal="true"
-            aria-label={
-              product.name[currentLanguage as keyof typeof product.name]
-            }
           >
-            {" "}
             <motion.div
-              className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto relative"
-              variants={modalVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
+              className="relative bg-stone-100 border-t-4 border-amber-500 rounded-2xl shadow-2xl w-full max-w-5xl h-auto max-h-[90vh] overflow-hidden flex flex-col md:flex-row"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              transition={{ duration: 0.2 }}
               onClick={(e) => e.stopPropagation()}
             >
               <button
@@ -378,7 +390,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
                 <X className="w-5 h-5 text-gray-600" />
               </button>
 
-              <div className="p-6">
+              <div className="flex-1 overflow-y-auto p-6 md:p-8">
                 <div className="grid md:grid-cols-2 gap-8">
                   {/* Product Images */}
                   <div className="space-y-4">
@@ -449,11 +461,13 @@ const ProductCard: React.FC<ProductCardProps> = ({
                   {/* Product Details */}
                   <div>
                     <h3 className="text-3xl font-bold text-gray-900 mb-4">
-                      {
-                        product.name[
-                          currentLanguage as keyof typeof product.name
-                        ]
-                      }
+                      {getText(
+                        product.name || {
+                          en: "Untitled Product",
+                          id: "Produk Tanpa Judul",
+                          ar: "منتج بدون عنوان",
+                        }
+                      )}
                     </h3>
 
                     {/* Rating and ID */}
@@ -478,17 +492,19 @@ const ProductCard: React.FC<ProductCardProps> = ({
                     </div>
 
                     {/* Product Description */}
-                    <div className="space-y-6">
+                    <div className="space-y-6 mb-6">
                       <div className="bg-amber-50 p-4 rounded-lg">
                         <h4 className="font-semibold text-amber-800 mb-2">
                           {t.products.productDetails.description}
                         </h4>
                         <p className="text-gray-700 text-sm leading-relaxed">
-                          {
-                            product.description[
-                              currentLanguage as keyof typeof product.description
-                            ]
-                          }
+                          {getText(
+                            product.description || {
+                              en: "No description available",
+                              id: "Tidak ada deskripsi",
+                              ar: "لا يوجد وصف",
+                            }
+                          )}
                         </p>
                       </div>
 
