@@ -192,18 +192,32 @@ const ProductForm: React.FC = () => {
       
       Indonesian Text: "${text.trim()}"`;
       
-      const response = await fetch('https://gateway.ai.cloudflare.com/v1/c3b9fa9ebddb0361afa9f84815831195/cloudflare/workers-ai/@cf/meta/llama-3.1-8b-instruct', {
+      // First try with Gemini
+      let response = await fetch('https://deepseek-proxy.aldo-tobing.workers.dev', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${import.meta.env.VITE_CF_TOKEN}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ 
           prompt,
-          max_tokens: 500,
-          temperature: 0.3
+          model: 'gemini-2.5-flash'
         }),
       });
+
+      // If Gemini fails, try DeepSeek
+      if (!response.ok) {
+        console.log('Gemini failed, trying DeepSeek...');
+        response = await fetch('https://deepseek-proxy.aldo-tobing.workers.dev', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ 
+            prompt,
+            model: 'deepseek-chat'
+          }),
+        });
+      }
   
       if (!response.ok) {
         const errorData = await response.text();
@@ -212,7 +226,11 @@ const ProductForm: React.FC = () => {
       }
   
       const data = await response.json();
-      const result = data.result?.response || data.choices?.[0]?.message?.content || '';
+      if (!data.ok || !data.text) {
+        throw new Error('Failed to get valid response from AI service');
+      }
+      
+      const result = data.text;
       
       try {
         // Clean up the response to extract just the JSON
