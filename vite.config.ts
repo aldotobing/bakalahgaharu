@@ -13,4 +13,13 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ['lucide-react'],
   },
+  server: {
+    proxy: {
+      '/api/cloudflare': {
+        target: 'https://gateway.ai.cloudflare.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/cloudflare/, ''),
+      }
+    }
+  }
 });

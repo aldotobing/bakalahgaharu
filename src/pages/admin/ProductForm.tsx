@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { Product } from '@/types';
-import { Loader2, Plus, Trash2, UploadCloud, ArrowLeft } from 'lucide-react';
+import { Loader2, Plus, Trash2, UploadCloud, ArrowLeft, Languages } from 'lucide-react';
 import { API_BASE_URL } from '@/config';
 import AdminHeader from '@/components/admin/AdminHeader';
+import { toast } from 'react-toastify';
 
 type PriceOption = {
   price: number;
@@ -51,6 +52,7 @@ const ProductForm: React.FC = () => {
   const [colorInput, setColorInput] = useState('');
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isTranslating, setIsTranslating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const fetchProduct = async () => {
@@ -167,6 +169,139 @@ const ProductForm: React.FC = () => {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       setImageFile(e.target.files[0]);
+    }
+  };
+
+  const translateText = async (text: string, targetLang: 'en' | 'ar'): Promise<string> => {
+    try {
+      if (!text.trim()) return '';
+      
+      setIsTranslating(true);
+      
+      // Clear any previous error
+      setError(null);
+      
+      // Create a more explicit prompt to get consistent JSON response
+      const prompt = `You are a translator. Translate this Indonesian text to English and Arabic.
+      
+      Return ONLY a valid JSON array with two objects in this exact format:
+      [
+        { "english": "English translation here" },
+        { "arab": "Arabic translation here" }
+      ]
+      
+      Indonesian Text: "${text.trim()}"`;
+      
+      const response = await fetch('/api/cloudflare/v1/c3b9fa9ebddb0361afa9f84815831195/cloudflare/workers-ai/@cf/meta/llama-3.1-8b-instruct', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${import.meta.env.VITE_CF_TOKEN}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          prompt,
+          max_tokens: 500,
+          temperature: 0.3
+        }),
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.text();
+        console.error('Translation API error:', errorData);
+        throw new Error(`Translation failed: ${response.status} ${response.statusText}`);
+      }
+  
+      const data = await response.json();
+      const result = data.result?.response || data.choices?.[0]?.message?.content || '';
+      
+      try {
+        // Clean up the response to extract just the JSON
+        const jsonString = result
+          .replace(/^[^{]*/, '') // Remove anything before the first {
+          .replace(/[^}]*$/, '') // Remove anything after the last }
+          .replace(/[\r\n]/g, ''); // Remove newlines
+          
+        // Try to parse the cleaned JSON
+        const translations = JSON.parse(`[${jsonString}]`);
+        
+        // Find the correct translation
+        const translationObj = targetLang === 'en' 
+          ? translations.find((t: any) => 'english' in t)
+          : translations.find((t: any) => 'arab' in t);
+        
+        if (!translationObj) {
+          throw new Error(`Could not find ${targetLang === 'en' ? 'English' : 'Arabic'} translation in response`);
+        }
+        
+        const translation = targetLang === 'en' 
+          ? translationObj.english 
+          : translationObj.arab;
+        
+        if (!translation || typeof translation !== 'string') {
+          throw new Error('Invalid translation format received');
+        }
+        
+        return translation.trim();
+        
+      } catch (parseError) {
+        console.error('Error parsing translation:', parseError);
+        console.error('Raw response:', result);
+        throw new Error('Failed to parse translation response');
+      }
+    } catch (error) {
+      console.error('Translation error:', error);
+      toast.error(`Failed to translate to ${targetLang === 'en' ? 'English' : 'Arabic'}`);
+      return '';
+    } finally {
+      setIsTranslating(false);
+    }
+  };
+
+  const handleTranslateName = async (targetLang: 'en' | 'ar') => {
+    if (!formData.name.id) {
+      toast.warning('Please enter Indonesian name first');
+      return;
+    }
+
+    try {
+      const translatedText = await translateText(formData.name.id, targetLang);
+      if (translatedText) {
+        setFormData(prev => ({
+          ...prev,
+          name: {
+            ...prev.name,
+            [targetLang]: translatedText
+          }
+        }));
+        toast.success(`Successfully translated name to ${targetLang === 'en' ? 'English' : 'Arabic'}`);
+      }
+    } catch (error) {
+      console.error('Name translation error:', error);
+      toast.error(`Failed to translate name to ${targetLang === 'en' ? 'English' : 'Arabic'}`);
+    }
+  };
+
+  const handleTranslateDescription = async (targetLang: 'en' | 'ar') => {
+    if (!formData.description.id) {
+      toast.warning('Please enter Indonesian description first');
+      return;
+    }
+
+    try {
+      const translatedText = await translateText(formData.description.id, targetLang);
+      if (translatedText) {
+        setFormData(prev => ({
+          ...prev,
+          description: {
+            ...prev.description,
+            [targetLang]: translatedText
+          }
+        }));
+        toast.success(`Translated to ${targetLang === 'en' ? 'English' : 'Arabic'} successfully`);
+      }
+    } catch (error) {
+      console.error('Translation error:', error);
+      toast.error('Translation failed. Please try again.');
     }
   };
 
@@ -312,23 +447,8 @@ const ProductForm: React.FC = () => {
                 <h2 className="text-lg font-medium text-gray-800 mb-6">Product Names</h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                   <div className="space-y-1">
-                    <label htmlFor="name.en" className="text-sm font-normal text-gray-600">
-                      English Name
-                    </label>
-                    <input
-                      type="text"
-                      name="name.en"
-                      id="name.en"
-                      value={formData.name.en}
-                      onChange={handleChange}
-                      required
-                      placeholder="E.g., Merauke Mid Grade"
-                      className="w-full px-3 py-2 text-gray-700 bg-gray-50 border-b-2 border-gray-200 focus:border-amber-400 focus:outline-none focus:bg-white transition-colors duration-200"
-                    />
-                  </div>
-                  <div className="space-y-1">
                     <label htmlFor="name.id" className="text-sm font-normal text-gray-600">
-                      Nama Indonesia
+                      Nama Indonesia <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
@@ -338,24 +458,73 @@ const ProductForm: React.FC = () => {
                       onChange={handleChange}
                       required
                       placeholder="Contoh: Gaharu Merauke Kualitas Menengah"
-                      className="w-full px-3 py-2 text-gray-700 bg-gray-50 border-b-2 border-gray-200 focus:border-amber-400 focus:outline-none focus:bg-white transition-colors duration-200"
+                      className="w-full px-3 py-2 text-gray-700 bg-white border-b-2 border-amber-100 focus:border-amber-400 focus:outline-none focus:bg-white transition-colors duration-200"
                     />
                   </div>
                   <div className="space-y-1">
-                    <label htmlFor="name.ar" className="text-sm font-normal text-gray-600">
-                      الاسم بالعربية
-                    </label>
-                    <input
-                      type="text"
-                      name="name.ar"
-                      id="name.ar"
-                      value={formData.name.ar}
-                      onChange={handleChange}
-                      dir="rtl"
-                      required
-                      placeholder="مثال: عود ميراوكي درجة متوسطة"
-                      className="w-full px-3 py-2 text-gray-700 bg-gray-50 border-b-2 border-gray-200 focus:border-amber-400 focus:outline-none focus:bg-white transition-colors duration-200"
-                    />
+                    <div className="flex justify-between items-center">
+                      <label htmlFor="name.en" className="text-sm font-normal text-gray-600">
+                        English Name
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => handleTranslateName('en')}
+                        disabled={isTranslating || !formData.name.id}
+                        className="inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-lg text-amber-700 bg-amber-100 hover:bg-amber-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {isTranslating ? (
+                          <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                        ) : (
+                          <Languages className="h-3 w-3 mr-1" />
+                        )}
+                        Translate
+                      </button>
+                    </div>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        name="name.en"
+                        id="name.en"
+                        value={formData.name.en}
+                        onChange={handleChange}
+                        required
+                        placeholder="E.g., Merauke Mid Grade"
+                        className="w-full px-3 py-2 text-gray-700 bg-gray-50 border-b-2 border-gray-200 focus:border-amber-400 focus:outline-none focus:bg-white transition-colors duration-200"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="flex justify-between items-center">
+                      <label htmlFor="name.ar" className="text-sm font-normal text-gray-600">
+                        الاسم بالعربية
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => handleTranslateName('ar')}
+                        disabled={isTranslating || !formData.name.id}
+                        className="inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-lg text-amber-700 bg-amber-100 hover:bg-amber-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {isTranslating ? (
+                          <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                        ) : (
+                          <Languages className="h-3 w-3 mr-1" />
+                        )}
+                        ترجمة
+                      </button>
+                    </div>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        name="name.ar"
+                        id="name.ar"
+                        value={formData.name.ar}
+                        onChange={handleChange}
+                        dir="rtl"
+                        required
+                        placeholder="مثال: عود ميراوكي درجة متوسطة"
+                        className="w-full px-3 py-2 text-gray-700 bg-gray-50 border-b-2 border-gray-200 focus:border-amber-400 focus:outline-none focus:bg-white transition-colors duration-200"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -365,26 +534,8 @@ const ProductForm: React.FC = () => {
                 <h2 className="text-lg font-medium text-gray-800 mb-6">Descriptions</h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                   <div className="space-y-1">
-                    <label htmlFor="description.en" className="text-sm font-normal text-gray-600">
-                      English Description
-                    </label>
-                    <div className="relative">
-                      <textarea
-                        name="description.en"
-                        id="description.en"
-                        value={formData.description.en}
-                        onChange={handleChange}
-                        rows={3}
-                        required
-                        placeholder="Enter product description in English..."
-                        className="w-full px-3 py-2 text-gray-700 bg-gray-50 rounded-lg border-2 border-gray-200 focus:border-amber-400 focus:outline-none focus:bg-white transition-colors duration-200 resize-none"
-                      />
-                      <p className="mt-1 text-xs text-gray-400">English product description</p>
-                    </div>
-                  </div>
-                  <div className="space-y-1">
                     <label htmlFor="description.id" className="text-sm font-normal text-gray-600">
-                      Deskripsi Indonesia
+                      Deskripsi Indonesia <span className="text-red-500">*</span>
                     </label>
                     <div className="relative">
                       <textarea
@@ -395,15 +546,62 @@ const ProductForm: React.FC = () => {
                         rows={3}
                         required
                         placeholder="Masukkan deskripsi produk..."
-                        className="w-full px-3 py-2 text-gray-700 bg-gray-50 rounded-lg border-2 border-gray-200 focus:border-amber-400 focus:outline-none focus:bg-white transition-colors duration-200 resize-none"
+                        className="w-full px-3 py-2 text-gray-700 bg-white rounded-lg border-2 border-amber-100 focus:border-amber-400 focus:outline-none focus:bg-white transition-colors duration-200 resize-none"
                       />
-                      <p className="mt-1 text-xs text-gray-400">Deskripsi produk dalam Bahasa Indonesia</p>
+                      <p className="mt-1 text-xs text-gray-400">Isi deskripsi produk dalam Bahasa Indonesia</p>
                     </div>
                   </div>
                   <div className="space-y-1">
-                    <label htmlFor="description.ar" className="text-sm font-normal text-gray-600">
-                      الوصف بالعربية
-                    </label>
+                    <div className="flex justify-between items-center">
+                      <label htmlFor="description.en" className="text-sm font-normal text-gray-600">
+                        English Description
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => handleTranslateDescription('en')}
+                        disabled={isTranslating || !formData.description.id}
+                        className="inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-lg text-amber-700 bg-amber-100 hover:bg-amber-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {isTranslating ? (
+                          <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                        ) : (
+                          <Languages className="h-3 w-3 mr-1" />
+                        )}
+                        Translate
+                      </button>
+                    </div>
+                    <div className="relative">
+                      <textarea
+                        name="description.en"
+                        id="description.en"
+                        value={formData.description.en}
+                        onChange={handleChange}
+                        rows={3}
+                        placeholder="English description will be auto-translated..."
+                        className="w-full px-3 py-2 text-gray-700 bg-gray-50 rounded-lg border-2 border-gray-200 focus:border-amber-400 focus:outline-none focus:bg-white transition-colors duration-200 resize-none"
+                      />
+                      <p className="mt-1 text-xs text-gray-400">English product description (auto-translated)</p>
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="flex justify-between items-center">
+                      <label htmlFor="description.ar" className="text-sm font-normal text-gray-600">
+                        الوصف بالعربية
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => handleTranslateDescription('ar')}
+                        disabled={isTranslating || !formData.description.id}
+                        className="inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-lg text-amber-700 bg-amber-100 hover:bg-amber-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {isTranslating ? (
+                          <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                        ) : (
+                          <Languages className="h-3 w-3 mr-1" />
+                        )}
+                        ترجمة
+                      </button>
+                    </div>
                     <div className="relative">
                       <textarea
                         name="description.ar"
@@ -412,11 +610,10 @@ const ProductForm: React.FC = () => {
                         onChange={handleChange}
                         dir="rtl"
                         rows={3}
-                        required
-                        placeholder="أدخل وصف المنتج..."
+                        placeholder="سيتم ترجمة الوصف تلقائياً..."
                         className="w-full px-3 py-2 text-gray-700 bg-gray-50 rounded-lg border-2 border-gray-200 focus:border-amber-400 focus:outline-none focus:bg-white transition-colors duration-200 resize-none"
                       />
-                      <p className="mt-1 text-xs text-gray-400 text-right">وصف المنتج باللغة العربية</p>
+                      <p className="mt-1 text-xs text-gray-400 text-right">الوصف باللغة العربية (مترجم تلقائياً)</p>
                     </div>
                   </div>
                 </div>
