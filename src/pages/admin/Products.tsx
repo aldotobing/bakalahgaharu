@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { API_BASE_URL } from '@/config';
-import { Plus, Edit, Trash2, Loader2, Search, PackageX, AlertTriangle } from 'lucide-react';
+import { Plus, Edit, Trash2, Loader2, Search, PackageX, AlertTriangle, Tag, Palette, DollarSign } from 'lucide-react';
 import AdminHeader from '@/components/admin/AdminHeader';
 
 // Skeleton Loader Component
@@ -57,6 +57,7 @@ const AdminProducts = () => {
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [productToDelete, setProductToDelete] = useState<string | null>(null);
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
@@ -99,15 +100,17 @@ const AdminProducts = () => {
     fetchProducts();
   }, [isAuthenticated, navigate]);
 
-  const handleDelete = async (productId: string) => {
-    if (!window.confirm('Are you sure you want to delete this product? This action cannot be undone.')) {
-      return;
-    }
+  const initiateDelete = (productId: string) => {
+    setProductToDelete(productId);
+  };
+
+  const confirmDelete = async () => {
+    if (!productToDelete) return;
 
     try {
-      setIsDeleting(productId);
+      setIsDeleting(productToDelete);
       const token = localStorage.getItem('authToken');
-      const response = await fetch(`${API_BASE_URL}/api/products/${productId}`, {
+      const response = await fetch(`${API_BASE_URL}/api/products/${productToDelete}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -120,12 +123,13 @@ const AdminProducts = () => {
         throw new Error(errorData.error || 'Failed to delete product');
       }
 
-      setProducts(prev => prev.filter(p => p.id !== productId));
+      setProducts(prev => prev.filter(p => p.id !== productToDelete));
     } catch (error) {
       console.error('Delete error:', error);
       setError(error instanceof Error ? error.message : 'Failed to delete product');
     } finally {
       setIsDeleting(null);
+      setProductToDelete(null); // Close the modal
     }
   };
 
@@ -200,7 +204,7 @@ const AdminProducts = () => {
                 </div>
               ) : (
                 filteredProducts.map((product) => (
-                  <div key={product.id} className="group bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-lg transition-shadow duration-300 border border-gray-100 transform hover:-translate-y-1">
+                  <div key={product.id} className="group bg-white rounded-xl shadow-sm overflow-hidden hover:shadow-lg transition-shadow duration-300 border border-gray-100 flex flex-col">
                     <div className="relative pb-[75%] bg-gray-50">
                       <img
                         src={product.image || 'https://via.placeholder.com/300x200?text=No+Image'}
@@ -224,7 +228,7 @@ const AdminProducts = () => {
                           <Edit size={18} />
                         </Link>
                         <button
-                          onClick={() => handleDelete(product.id)}
+                          onClick={() => initiateDelete(product.id)}
                           className="p-2 bg-white/80 backdrop-blur-sm text-gray-700 hover:text-red-600 hover:bg-white rounded-full shadow-md transition-colors"
                           disabled={isDeleting === product.id}
                           title="Delete"
@@ -237,19 +241,45 @@ const AdminProducts = () => {
                         </button>
                       </div>
                     </div>
-                    <div className="p-4">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <h3 className="font-semibold text-gray-900 line-clamp-1">{product.name.en}</h3>
-                          <p className="text-sm text-gray-500">{product.grade}</p>
-                        </div>
-                        <span className="text-lg font-bold text-gray-900">
-                          {product.prices[0]?.price.toLocaleString('en-US', {
-                            style: 'currency',
-                            currency: product.currency || 'USD',
-                          })}
-                        </span>
+                    <div className="p-4 flex flex-col flex-grow">
+                      <h3 className="font-bold text-gray-800 text-lg truncate">{product.name.en}</h3>
+                      <div className="flex items-center text-sm text-gray-500 mt-1">
+                        <Tag size={14} className="mr-1.5 flex-shrink-0" />
+                        <span>Grade: {product.grade}</span>
                       </div>
+                      
+                      <div className="mt-4 flex-grow">
+                                                <h4 className="flex items-center text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                          <DollarSign size={12} className="mr-1.5" />
+                          Pricing
+                        </h4>
+                        <ul className="mt-1 text-sm text-gray-700 space-y-1">
+                          {product.prices.slice(0, 2).map((p, index) => (
+                            <li key={index} className="flex justify-between items-center">
+                              <span>{p.size} ({p.unit})</span>
+                              <span className="font-semibold text-gray-800">
+                                {p.price.toLocaleString('en-US', { style: 'currency', currency: product.currency || 'USD', minimumFractionDigits: 0 })}
+                              </span>
+                            </li>
+                          ))}
+                          {product.prices.length > 2 && <li className="text-xs text-gray-400 text-center pt-1">...and more</li>}
+                          {product.prices.length === 0 && <li className="text-xs text-gray-400">No prices set</li>}
+                        </ul>
+                      </div>
+
+                      {product.colors && product.colors.length > 0 && (
+                        <div className="mt-4">
+                                                        <h4 className="flex items-center text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                              <Palette size={12} className="mr-1.5" />
+                              Colors
+                            </h4>
+                            <div className="flex flex-wrap gap-2 mt-2">
+                                {product.colors.map(color => (
+                                    <span key={color} className="text-xs px-2.5 py-1 bg-gray-100 text-gray-800 rounded-full font-medium">{color}</span>
+                                ))}
+                            </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))
@@ -258,6 +288,50 @@ const AdminProducts = () => {
           )}
         </div>
       </main>
+
+      {/* Confirmation Modal */}
+      {productToDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4 transition-opacity duration-300" style={{ animation: 'fadeIn 0.3s ease-out' }}>
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md transform transition-all duration-300" style={{ animation: 'scaleIn 0.3s ease-out' }}>
+            <div className="p-6">
+              <div className="flex items-start">
+                <div className="flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                  <AlertTriangle className="h-6 w-6 text-red-600" aria-hidden="true" />
+                </div>
+                <div className="ml-4 text-left">
+                  <h3 className="text-lg leading-6 font-medium text-gray-900">
+                    Delete Product
+                  </h3>
+                  <div className="mt-2">
+                    <p className="text-sm text-gray-500">
+                      Are you sure you want to delete this product? This action cannot be undone. All associated data will be permanently removed.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="bg-gray-50 px-6 py-4 flex justify-end space-x-3 rounded-b-lg">
+              <button
+                type="button"
+                className="inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 sm:text-sm transition-colors"
+                onClick={() => setProductToDelete(null)}
+                disabled={!!isDeleting}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="inline-flex items-center justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:text-sm disabled:bg-red-400 transition-colors"
+                onClick={confirmDelete}
+                disabled={!!isDeleting}
+              >
+                {isDeleting ? <Loader2 className="animate-spin -ml-1 mr-2 h-5 w-5" /> : null}
+                {isDeleting ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
