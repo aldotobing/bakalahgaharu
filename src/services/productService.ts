@@ -9,7 +9,7 @@ export const fetchProducts = async (token?: string): Promise<{ products: Product
   const staticProductsList = [...staticProducts];
   
   try {
-    console.log('Fetching products from:', `${API_BASE_URL}/api/products`);
+    //console.log('Fetching products from:', `${API_BASE_URL}/api/products`);
     // Try to fetch dynamic products
     const headers: HeadersInit = {
       'Accept': 'application/json',
@@ -22,14 +22,14 @@ export const fetchProducts = async (token?: string): Promise<{ products: Product
 
     const response = await fetch(`${API_BASE_URL}/api/products`, { headers });
     
-    console.log('API Response status:', response.status, response.statusText);
+    //console.log('API Response status:', response.status, response.statusText);
     
     // If successful, combine with static products
     if (response.ok) {
       let dynamicProducts;
       try {
         dynamicProducts = await response.json();
-        console.log('Fetched products from API:', dynamicProducts);
+        //console.log('Fetched products from API:', dynamicProducts);
       } catch (jsonError) {
         console.error('Error parsing JSON response:', jsonError);
         throw new Error('Invalid JSON response from server');
@@ -52,16 +52,16 @@ export const fetchProducts = async (token?: string): Promise<{ products: Product
         }
       });
       
-      console.log('Combined products:', allProducts);
+      //console.log('Combined products:', allProducts);
       return { products: allProducts, isUsingFallback: false };
     }
     
     // If error, still return static products
-    console.warn('Failed to fetch dynamic products, using static data');
+    //console.warn('Failed to fetch dynamic products, using static data');
     return { products: staticProductsList, isUsingFallback: true };
     
   } catch (error) {
-    console.warn('Error fetching products, using static data:', error);
+    //console.warn('Error fetching products, using static data:', error);
     return { products: staticProductsList, isUsingFallback: true };
   }
 };
