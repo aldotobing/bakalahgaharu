@@ -113,9 +113,15 @@ const ProductForm: React.FC = () => {
       const [_, index, field] = name.split('.');
       const priceIndex = parseInt(index);
       const prices = [...formData.prices];
+      
+      // Only parse as number if the field is 'price' and has a value
+      const newValue = field === 'price' 
+        ? (value === '' ? '' : parseFloat(value) || 0)
+        : value;
+        
       prices[priceIndex] = {
         ...prices[priceIndex],
-        [field]: field === 'price' ? (value ? parseFloat(value) : 0) : value
+        [field]: newValue
       };
       setFormData(prev => ({ ...prev, prices }));
     } else {
