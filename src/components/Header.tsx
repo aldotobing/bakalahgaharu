@@ -1,14 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Menu, X, ChevronDown } from 'lucide-react';
-import ReactCountryFlag from 'react-country-flag';
+import React, { useState } from 'react';
+import { Menu, X } from 'lucide-react';
 import { Translation, LanguageCode } from '../types';
-import { languages } from '../data/translations';
-
-const countryCodes: Record<string, string> = {
-  en: 'GB',
-  id: 'ID',
-  ar: 'SA'
-};
+import LanguageSelector from './LanguageSelector';
 
 interface HeaderProps {
   t: Translation;
@@ -19,22 +12,6 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ t, currentLanguage, onLanguageChange, isRTL }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isLangMenuOpen, setIsLangMenuOpen] = useState(false);
-  const langMenuRef = useRef<HTMLDivElement>(null);
-
-  // Close language menu when clicking outside
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (langMenuRef.current && !langMenuRef.current.contains(event.target as Node)) {
-        setIsLangMenuOpen(false);
-      }
-    }
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
 
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
@@ -81,89 +58,10 @@ const Header: React.FC<HeaderProps> = ({ t, currentLanguage, onLanguageChange, i
 
           {/* Language Selector & Mobile Menu */}
           <div className="flex items-center space-x-2 sm:space-x-4">
-            {/* Always visible language selector on mobile */}
-            <div className="relative md:hidden" ref={langMenuRef}>
-              <button
-                onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-lg bg-amber-50 hover:bg-amber-100 transition-colors duration-200 text-amber-700 text-sm sm:text-base"
-              >
-                <ReactCountryFlag
-                  countryCode={countryCodes[currentLanguage]}
-                  svg
-                  className="w-4 h-4 sm:w-5 sm:h-5 rounded-sm overflow-hidden"
-                />
-                <span className="font-medium">{currentLanguage.toUpperCase()}</span>
-                <ChevronDown className={`w-3 h-3 sm:w-4 sm:h-4 transition-transform ${isLangMenuOpen ? 'rotate-180' : ''}`} />
-              </button>
-              
-              {isLangMenuOpen && (
-                <div className="absolute right-0 mt-2 w-36 bg-white/95 backdrop-blur-sm rounded-lg shadow-xl border border-gray-200 overflow-hidden z-50">
-                  {languages.map((lang) => (
-                    <button
-                      key={lang.code}
-                      onClick={() => {
-                        onLanguageChange(lang.code);
-                        setIsLangMenuOpen(false);
-                      }}
-                      className={`w-full px-4 py-2 text-left text-sm font-medium ${
-                        currentLanguage === lang.code 
-                          ? 'bg-amber-50 text-amber-700' 
-                          : 'text-gray-700 hover:bg-gray-50'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2">
-                        <ReactCountryFlag
-                          countryCode={countryCodes[lang.code]}
-                          svg
-                          className="w-4 h-4 rounded-sm overflow-hidden"
-                        />
-                        <span>{lang.name}</span>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Desktop language selector */}
-            <div className="hidden md:block relative" ref={langMenuRef}>
-              <button
-                onClick={() => setIsLangMenuOpen(!isLangMenuOpen)}
-                className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors duration-200 text-gray-700"
-              >
-                <ReactCountryFlag
-                  countryCode={countryCodes[currentLanguage]}
-                  svg
-                  className="w-5 h-5 rounded-sm overflow-hidden"
-                />
-                <span className="text-sm font-medium">{currentLanguage.toUpperCase()}</span>
-                <ChevronDown className={`w-4 h-4 transition-transform ${isLangMenuOpen ? 'rotate-180' : ''}`} />
-              </button>
-              
-              {isLangMenuOpen && (
-                <div className="absolute right-0 mt-2 w-32 bg-white/95 backdrop-blur-sm rounded-lg shadow-xl border border-gray-200 overflow-hidden z-50">
-                  {languages.map((lang) => (
-                    <button
-                      key={lang.code}
-                      onClick={() => {
-                        onLanguageChange(lang.code);
-                        setIsLangMenuOpen(false);
-                      }}
-                      className={`w-full px-4 py-2 text-left text-sm font-medium ${
-                        currentLanguage === lang.code 
-                          ? 'bg-amber-50 text-amber-700' 
-                          : 'text-gray-700 hover:bg-gray-50'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2">
-                        <span className="text-base">{lang.flag}</span>
-                        <span>{lang.name}</span>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+            <LanguageSelector 
+              currentLanguage={currentLanguage} 
+              onLanguageChange={onLanguageChange} 
+            />
             
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -193,33 +91,7 @@ const Header: React.FC<HeaderProps> = ({ t, currentLanguage, onLanguageChange, i
                   {t.nav[item as keyof typeof t.nav]}
                 </button>
               ))}
-              <div className="px-5 py-3">
-                <div className="space-y-2">
-                  {languages.map((lang) => (
-                    <button
-                      key={lang.code}
-                      onClick={() => {
-                        onLanguageChange(lang.code);
-                        setIsMenuOpen(false);
-                      }}
-                      className={`w-full px-4 py-2 text-left text-sm font-medium rounded-lg ${
-                        currentLanguage === lang.code 
-                          ? 'bg-amber-50 text-amber-700' 
-                          : 'text-gray-700 hover:bg-gray-50'
-                      }`}
-                    >
-                      <div className="flex items-center gap-2">
-                        <ReactCountryFlag
-                          countryCode={countryCodes[lang.code]}
-                          svg
-                          className="w-5 h-5 rounded-sm overflow-hidden"
-                        />
-                        <span>{lang.name}</span>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
+
             </div>
           </div>
         )}
