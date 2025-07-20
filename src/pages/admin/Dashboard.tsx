@@ -35,10 +35,35 @@ const Dashboard = () => {
   }, []);
 
   const stats = [
-    { name: 'Total Revenue', stat: '$405,091.00', icon: DollarSign, change: '+4.75%', changeType: 'increase' },
-    { name: 'New Orders', stat: '1,342', icon: ShoppingCart, change: '+12.1%', changeType: 'increase' },
-    { name: 'Total Products', stat: isLoading ? '...' : productCount.toString(), icon: Package, change: '', changeType: 'increase' },
-    { name: 'New Customers', stat: '89', icon: Users, change: '-1.2%', changeType: 'decrease' },
+    { 
+      name: 'Total Products', 
+      stat: isLoading ? '...' : productCount.toString(), 
+      icon: Package, 
+      change: '', 
+      changeType: 'increase',
+      link: '/admin/products'
+    },
+    { 
+      name: 'Total Revenue', 
+      stat: '$405,091.00', 
+      icon: DollarSign, 
+      change: '+4.75%', 
+      changeType: 'increase' 
+    },
+    { 
+      name: 'New Orders', 
+      stat: '1,342', 
+      icon: ShoppingCart, 
+      change: '+12.1%', 
+      changeType: 'increase' 
+    },
+    { 
+      name: 'New Customers', 
+      stat: '89', 
+      icon: Users, 
+      change: '-1.2%', 
+      changeType: 'decrease' 
+    },
   ];
 
   const recentActivities = [
@@ -68,31 +93,49 @@ const Dashboard = () => {
 
         {/* Stats Cards */}
         <section className="grid md:grid-cols-2 xl:grid-cols-4 gap-6">
-          {stats.map((item) => (
-            <div key={item.name} className="bg-white p-6 rounded-lg shadow-md flex items-center justify-between transform transition-transform duration-300 hover:-translate-y-1 hover:shadow-lg">
-              <div>
-                <p className="text-sm font-medium text-gray-500">{item.name}</p>
-                <p className="text-3xl font-bold text-gray-900 mt-1 flex items-center">
-                  {item.name === 'Total Products' && isLoading ? (
-                    <Loader2 className="h-7 w-7 animate-spin text-gray-400" />
-                  ) : (
-                    item.stat
-                  )}
-                </p>
-                <div className={`flex items-center mt-2 text-sm ${item.changeType === 'increase' ? 'text-green-600' : 'text-red-600'}`}>
-                  {item.changeType === 'increase' ? (
-                    <ArrowUpRight className="w-4 h-4" />
-                  ) : (
-                    <ArrowDownRight className="w-4 h-4" />
-                  )}
-                  {item.change && <span className="ml-1">{item.change} from last month</span>}
+          {stats.map((item) => {
+            const content = (
+              <div className="h-full">
+                <div className="bg-white p-6 rounded-lg shadow-md flex items-center justify-between transform transition-all duration-300 hover:-translate-y-1 hover:shadow-lg h-full">
+                  <div>
+                    <p className="text-sm font-medium text-gray-500">{item.name}</p>
+                    <p className="text-3xl font-bold text-gray-900 mt-1 flex items-center">
+                      {isLoading && item.name === 'Total Products' ? (
+                        <Loader2 className="h-7 w-7 animate-spin text-gray-400" />
+                      ) : (
+                        item.stat
+                      )}
+                    </p>
+                    <div className={`flex items-center mt-2 text-sm ${item.changeType === 'increase' ? 'text-green-600' : 'text-red-600'}`}>
+                      {item.change && (
+                        <>
+                          {item.changeType === 'increase' ? (
+                            <ArrowUpRight className="w-4 h-4" />
+                          ) : (
+                            <ArrowDownRight className="w-4 h-4" />
+                          )}
+                          <span className="ml-1">{item.change} from last month</span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                  <div className={`p-4 rounded-full ${item.name === 'Total Products' ? 'bg-amber-100' : 'bg-gray-100'}`}>
+                    <item.icon className={`h-7 w-7 ${item.name === 'Total Products' ? 'text-amber-600' : 'text-gray-600'}`} />
+                  </div>
                 </div>
               </div>
-              <div className="bg-amber-100 p-4 rounded-full">
-                <item.icon className="h-7 w-7 text-amber-600" />
+            );
+
+            return item.link ? (
+              <Link key={item.name} to={item.link} className="block h-full">
+                {content}
+              </Link>
+            ) : (
+              <div key={item.name} className="h-full">
+                {content}
               </div>
-            </div>
-          ))}
+            );
+          })}
         </section>
 
         {/* Charts and Recent Activities */}

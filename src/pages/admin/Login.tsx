@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -10,9 +10,59 @@ const Login = () => {
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
-  const { isLoading, error: authError } = useAuth();
-  const { login } = useAuth();
+  const [logoutReason, setLogoutReason] = useState('');
+  const { isLoading, error: authError, login, logout } = useAuth();
   const navigate = useNavigate();
+  
+  // Pass the navigate function to the logout function
+  useEffect(() => {
+    // This will update the logout function with the current navigate function
+    // whenever the component mounts or navigate changes
+    const originalLogout = logout;
+    const logoutWithNavigate = (reason?: string | Error) => originalLogout(reason, navigate);
+    
+    // Update the logout function in the context
+    // @ts-ignore - We know what we're doing here
+    login.logout = logoutWithNavigate;
+    
+    return () => {
+      // Restore the original logout function when component unmounts
+      // @ts-ignore
+      login.logout = originalLogout;
+    };
+  }, [navigate, logout]);
+
+  // Check for authentication state and logout reason on component mount
+  useEffect(() => {
+    // Check for a specific logout reason first
+    const reason = sessionStorage.getItem('logoutReason');
+    const wasAuthenticated = sessionStorage.getItem('wasAuthenticated') === 'true';
+    const token = localStorage.getItem('authToken');
+    
+    // If we were authenticated but now have no token, show expired message
+    if (wasAuthenticated && !token) {
+      const message = reason || 'Your session has expired. Please log in again.';
+      setLogoutReason(message);
+      // Clear the flags but keep the reason for the current session
+      sessionStorage.removeItem('wasAuthenticated');
+      return;
+    }
+    
+    // If we have a logout reason, show it
+    if (reason) {
+      setLogoutReason(reason);
+      // Don't remove the reason yet, we'll do it after the component mounts
+    }
+    
+    // Clean up when component unmounts
+    return () => {
+      // Only clear the reason if the user is logging in successfully
+      if (!isLoading && !error) {
+        sessionStorage.removeItem('logoutReason');
+      }
+      sessionStorage.removeItem('wasAuthenticated');
+    };
+  }, [isLoading, error, setLogoutReason]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,6 +70,9 @@ const Login = () => {
     
     const success = await login(username, password);
     if (success) {
+      // Clear any existing logout reason when logging in successfully
+      sessionStorage.removeItem('logoutReason');
+      setLogoutReason('');
       navigate('/admin');
     } else if (!error) {
       // Only set error if not already set by the auth context
@@ -41,7 +94,17 @@ const Login = () => {
             Admin Portal
           </h2>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+        
+        {logoutReason && (
+          <div className="mb-6 p-4 bg-red-50 text-red-700 rounded-lg border border-red-200">
+            <div className="flex items-center">
+              <AlertTriangle className="h-5 w-5 mr-2 flex-shrink-0" />
+              <span>{logoutReason}</span>
+            </div>
+          </div>
+        )}
+        
+        <form className="mt-4 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div className="relative">
               <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />

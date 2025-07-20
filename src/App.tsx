@@ -7,17 +7,49 @@ import Products from './components/Products';
 import Contact from './components/Contact';
 import Footer from './components/Footer';
 import { useLanguage } from './hooks/useLanguage';
-import { AuthProvider } from './contexts/AuthContext';
+import { AuthProvider, setupResponseInterceptor, useAuth } from './contexts/AuthContext';
+import { initializeApiClient } from './utils/api';
 import Login from './pages/admin/Login';
 import Dashboard from './pages/admin/Dashboard';
 import AdminProducts from './pages/admin/Products';
 import ProductForm from './pages/admin/ProductForm';
 import ProtectedRoute from './components/ProtectedRoute';
 
-const MainContent = () => {
-  const { currentLanguage, setCurrentLanguage, t, isRTL } = useLanguage();
+// Component to set up the response interceptor
+const AuthSetup = () => {
+  const { logout } = useAuth();
 
   useEffect(() => {
+    // Create a wrapper function that handles the reason
+    const handleUnauthorized = (reason?: string | Error) => {
+      const message = reason 
+        ? (typeof reason === 'string' ? reason : reason.message)
+        : 'Your session has expired. Please log in again.';
+      logout(message);
+    };
+
+    // Initialize the API client with the wrapper function
+    initializeApiClient(handleUnauthorized);
+
+    // Set up the response interceptor with the wrapper function
+    setupResponseInterceptor(handleUnauthorized);
+  }, [logout]);
+
+  return null;
+};
+
+const MainContent = () => {
+  const { currentLanguage, setCurrentLanguage, t, isRTL } = useLanguage();
+  const { isAuthenticated } = useAuth();
+
+  useEffect(() => {
+    // Track authentication state in session storage
+    if (isAuthenticated) {
+      sessionStorage.setItem('wasAuthenticated', 'true');
+    } else {
+      sessionStorage.removeItem('wasAuthenticated');
+    }
+    
     // Set document direction and language
     document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
     document.documentElement.lang = currentLanguage;
@@ -110,10 +142,11 @@ function App() {
   return (
     <AuthProvider>
       <Router>
+        <AuthSetup />
         <Routes>
           <Route path="/admin/login" element={<Login />} />
           <Route path="/admin" element={<ProtectedRoute />}>
-                        <Route index element={<Dashboard />} />
+            <Route index element={<Dashboard />} />
             <Route path="products" element={<AdminProducts />} />
             <Route path="products/new" element={<ProductForm />} />
             <Route path="products/edit/:id" element={<ProductForm />} />
