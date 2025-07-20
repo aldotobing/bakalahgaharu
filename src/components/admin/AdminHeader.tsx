@@ -58,7 +58,7 @@ const AdminHeader = () => {
               View Website
             </Link>
             <button
-              onClick={logout}
+              onClick={() => logout()}
               className="inline-flex items-center px-3 py-2 rounded-md text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white"
             >
               <LogOut className="mr-2 h-4 w-4" />
@@ -81,7 +81,7 @@ const AdminHeader = () => {
       </div>
       <AnimatePresence>
         {isMenuOpen && (
-          <motion.div 
+          <motion.div
             className="sm:hidden"
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
@@ -116,7 +116,7 @@ const AdminHeader = () => {
                   View Website
                 </a>
                 <button
-                  onClick={logout}
+                  onClick={() => logout()}
                   className="w-full text-left flex items-center px-3 py-2 rounded-md text-base font-medium text-gray-300 hover:bg-gray-700 hover:text-white"
                 >
                   <LogOut className="mr-3 h-5 w-5" />
