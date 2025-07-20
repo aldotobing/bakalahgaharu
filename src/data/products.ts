@@ -17,7 +17,7 @@ export const products: Product[] = [
       id: "Aroma khas gaharu merauke kualitas super ketika dibakar dan dicium sangat tebal dan padat, membentuk mini natural atau super merauke. Model ini sangat familiar dan paling diminati oleh negara-negara seperti Arab Saudi, Abu Dhabi, Dubai, Qatar, dan wilayah Timur Tengah lainnya. Aroma yang kuat dan khasnya dapat menenangkan, merilekskan dan juga menambah aura positif pada ruangan dan diri Anda.",
       ar: "العطر المميز لخشب العود من نوع ميراوكي عندما يتم حرقه واستنشاقه، يكون كثيفًا وغنيًا، مشكلاً رائحة طبيعية مصغرة أو ميراوكي فائق. هذا النوع مألوف جداً والأكثر طلباً في دول مثل المملكة العربية السعودية وأبو ظبي ودبي وقطر ومناطق الشرق الأوسط الأخرى. رائحته القوية والمميزة يمكن أن تهدئ وتريح وتضيف أيضاً طاقة إيجابية للغرفة ولنفسك.",
     },
-    image: "/product1.jpg",
+    image: "/images/products/product1.jpg",
     badge: {
       en: "Best Seller",
       id: "Paling Laris",
@@ -40,7 +40,7 @@ export const products: Product[] = [
       id: 'Aroma "Gaharu Merauke Sanai Muhassan" kualitas premium memiliki dimensi rempah yang khas. Saat dibakar, tidak hanya mengeluarkan aroma manis dan kayu, tetapi juga beresonansi dengan catatan rempah yang luar biasa. Keharuman ini memiliki kedalaman dan kehangatan, membangkitkan kenangan akan rempah-rempah yang secara tradisional digunakan dalam budaya Arab dan Asia, menciptakan suasana yang mewah dan elegan. Dengan setiap tarikan nafas, aroma ini meningkatkan pengalaman, menjadi simbol kemewahan yang sangat dihargai oleh kalangan elit.',
       ar: 'عطر "عود ميراوكي ثاني محسن" من الدرجة الممتازة يمتلك بلا شك بُعداً متميزاً من التوابل. عند حرقه، لا يطلق فقط رائحة حلوة وخشبية، بل يتناغم أيضاً مع نفحات توابل استثنائية. لهذا العطر عمق ودفء، يثير الحنين إلى التوابل المستخدمة تقليدياً في الثقافتين العربية والآسيوية، مما يخلق أجواءً غنية وأنيقة. مع كل استنشاق، يرتقي هذا العطر بالتجربة، ليصبح رمزاً للفخامة التي يقدرها النخبة بشكل كبير.',
     },
-    image: "/product2.jpg",
+    image: "/images/products/product2.jpg",
     badge: {
       en: "Most Wanted",
       id: "Paling Dicari",
@@ -67,7 +67,7 @@ export const products: Product[] = [
       id: "Minyak gaharu Sumatera adalah produk yang sangat dihargai di seluruh dunia Minyak gaharu Sumatera merupakan komoditas premium yang sangat dicari di pasar global. Diambil dari pohon Aquilaria, asli Sumatera, yang terkenal dengan kualitas gaharu terbaik, dan di proses dengan menggunakan metode suling uap tradisional untuk mempertahankan kualitas aroma dan sifat terapeutik. Memiliki aroma yang kaya, kompleks, dengan nuansa kayu, manis, dan sedikit rempah yang menenangkan, dan aroma sedikit terbakar memberikan kesan dan kehangatan. Dengan karakteristik ini, minyak gaharu Sumatera tidak hanya sekadar minyak gaharu biasa, tetapi juga sebuah pengalaman yang menghargai alam dan tradisi.",
       ar: "زيت العود السومطري هو منتج مرموق يحظى بتقدير عالمي. يتم استخراجه من أشجار العود الأصلية في سومطرة، المعروفة بإنتاج أجود أنواع خشب العود، وهو سلعة فاخرة تحظى بطلب كبير في السوق العالمية. باستخدام طرق التقطير البخاري التقليدية للحفاظ على جودته العطرية وخصائصه العلاجية، يلتقط زيتنا جوهر خبرة قرون من الزمن. يقدم عطراً غنياً ومعقداً مع نفحات خشبية ولمسات حلوة وتوابل خفيفة، بينما تضيف نفحته الدخانية اللطيفة الدفء والشخصية المميزة. هذه الخصائص تجعل زيت العود السومطري ليس مجرد زيت عطري عادي، بل تجربة تكرم الطبيعة والتقاليد.",
     },
-    image: "/MinyakGaharu.jpg",
+    image: "/images/products/MinyakGaharu.jpg",
     badge: {
       en: "Best Seller",
       id: "Paling Laris",
@@ -90,7 +90,7 @@ export const products: Product[] = [
       id: "Minyak Nilam / Patchouli Oil, adalah minyak esensial yang dihasilkan dari daun tanaman Pogostemon cablin. Dikenal karena aroma yang kaya dan unik, minyak ini sering digunakan dalam parfum, produk kecantikan, dan aromaterapi. Minyak nilam memiliki aroma yang kuat, manis, dan earthy, menjadikannya populer dalam industri parfum dan kosmetik. Selain itu, minyak ini sering digunakan dalam aromaterapi untuk membantu meredakan stres dan kecemasan. Minyak nilam juga dikenal memiliki sifat antibakteri dan antiseptik, sehingga sering ditambahkan dalam produk perawatan kulit untuk membantu mengatasi jerawat dan merawat kulit. Secara umum, minyak nilam dianggap sebagai bahan alami yang bermanfaat dalam berbagai aspek, dari kecantikan hingga kesehatan.",
       ar: "زيت الباتشولي هو زيت عطري يستخرج من أوراق نبات البوغوستيمون كابلن. يُعرف بعطره الغني والفريد، ويستخدم على نطاق واسع في العطور ومستحضرات التجميل والعلاج بالروائح. يتميز زيت الباتشولي برائحة قوية وحلوة وترابية، مما يجعله مفضلاً في صناعة العطور ومستحضرات التجميل. كما يستخدم بشكل متكرر في العلاج بالروائح للمساعدة في تخفيف التوتر والقلق. يُعرف زيت الباتشولي أيضاً بخصائصه المضادة للبكتيريا والمطهرة، مما يجعله مكوناً شائعاً في منتجات العناية بالبشرة للمساعدة في علاج حب الشباب وتغذية البشرة. بشكل عام، يعتبر زيت الباتشولي مكوناً طبيعياً مفيداً في جوانب متعددة، من الجمال إلى الصحة.",
     },
-    image: "/patchouliOil.jpg",
+    image: "/images/products/patchouliOil.jpg",
     badge: {
       en: "Best Seller",
       id: "Paling Laris",

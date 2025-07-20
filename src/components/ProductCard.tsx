@@ -9,10 +9,13 @@ import {
   Twitter,
   Linkedin,
   Link as LinkIcon,
+  Loader2,
 } from "lucide-react";
+import imageCompression from "browser-image-compression";
 import WhatsAppButton from "./WhatsAppButton";
 import { whatsappMessages } from "../data/whatsappMessages";
 import { Product, Translation } from "../types";
+import OptimizedImage from "./ui/OptimizedImage";
 
 interface ProductCardProps {
   product: Product;
@@ -30,6 +33,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
   const [isHovered, setIsHovered] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [isSharing, setIsSharing] = useState(false);
   const messages =
     whatsappMessages[currentLanguage as keyof typeof whatsappMessages];
 
@@ -80,9 +84,16 @@ const ProductCard: React.FC<ProductCardProps> = ({
       t.products.grade
     } ${t.products.productDetails.availability.toLowerCase()} ${priceText}`;
 
+    // Get current product image URL - ensure it's an absolute URL
+    const imageUrl = product.image.startsWith("http")
+      ? product.image
+      : `${window.location.origin}${product.image.startsWith("/")
+          ? ""
+          : "/"}${product.image}`;
+
     if (platform === "copy") {
       try {
-        await navigator.clipboard.writeText(productUrl);
+        await navigator.clipboard.writeText(`${shareText}\n${productUrl}`);
         alert(t.products.productDetails.linkCopied);
         return;
       } catch (err) {
@@ -90,29 +101,79 @@ const ProductCard: React.FC<ProductCardProps> = ({
       }
     }
 
-    const shareData = {
-      title: product.name[currentLanguage as keyof typeof product.name],
-      text: shareText,
-      url: productUrl,
-    };
-
-    if (navigator.share) {
+    // Check if Web Share API is supported
+    if (navigator.share && !platform) {
       try {
+        const shareData: ShareData = {
+          title: product.name[currentLanguage as keyof typeof product.name],
+          text: shareText,
+          url: productUrl,
+        };
+
+        // Only include files if it's a secure context (HTTPS)
+        if (window.isSecureContext) {
+          try {
+            setIsSharing(true);
+            // Fetch the original image
+            const response = await fetch(imageUrl);
+            const imageBlob = await response.blob();
+            
+            // Compress the image before sharing
+            const options = {
+              maxSizeMB: 0.5,          // Maximum size in MB (reduced from default)
+              maxWidthOrHeight: 1200,  // Maximum width/height in pixels
+              useWebWorker: true,      // Use web worker for better performance
+              fileType: 'image/jpeg',  // Convert to JPEG for better compression
+              initialQuality: 0.7,     // Quality level (0.7 = 70%)
+              alwaysKeepResolution: true,
+            };
+            
+            const compressedBlob = await imageCompression(imageBlob as File, options);
+            
+            // Create a sanitized filename from the product name
+            const productName = product.name.en || 'product';
+            const sanitizedName = productName
+              .toLowerCase()
+              .replace(/[^a-z0-9]+/g, '-')
+              .replace(/^-+|-+$/g, '');
+            const fileName = `${sanitizedName}-${product.id}.jpg`;
+            
+            const file = new File([compressedBlob], fileName, {
+              type: 'image/jpeg', // Always use JPEG for compressed output
+            });
+            
+            shareData.files = [file];
+          } catch (error) {
+            console.error("Error preparing image for sharing:", error);
+          } finally {
+            setIsSharing(false);
+          }
+        }
+
         await navigator.share(shareData);
+        return;
       } catch (err) {
         console.error("Error sharing:", err);
       }
-    } else if (platform) {
-      // Fallback for browsers that don't support Web Share API
+    }
+
+    // Fallback to social media sharing
+    if (platform) {
       const socialUrls = {
         facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
           productUrl
+        )}&picture=${encodeURIComponent(imageUrl)}&description=${encodeURIComponent(
+          shareText
         )}`,
         twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(
           shareText
         )}&url=${encodeURIComponent(productUrl)}`,
         linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
           productUrl
+        )}&title=${encodeURIComponent(
+          product.name[currentLanguage as keyof typeof product.name]
+        )}&summary=${encodeURIComponent(shareText)}&source=${encodeURIComponent(
+          window.location.hostname
         )}`,
       };
 
@@ -191,20 +252,16 @@ const ProductCard: React.FC<ProductCardProps> = ({
         {/* Image */}
         <div className="relative h-64 overflow-hidden">
           <motion.div className="w-full h-full" variants={imageHoverVariants}>
-            <img
+            <OptimizedImage
               src={product.image || "/placeholder-product.jpg"}
               alt={getText(product.name || { en: "Product image" })}
               className="w-full h-full object-cover"
+              quality={0.8}
               loading="lazy"
-              width="400"
-              height="300"
-              onError={(e) => {
-                // Fallback to placeholder if image fails to load
-                const target = e.target as HTMLImageElement;
-                if (target.src !== "/placeholder-product.jpg") {
-                  target.src = "/placeholder-product.jpg";
-                }
-              }}
+              width={400}
+              height={300}
+              maxWidth={800}
+              maxHeight={600}
             />
           </motion.div>
           <motion.div
@@ -445,10 +502,13 @@ const ProductCard: React.FC<ProductCardProps> = ({
                             productImages.length
                           }`}
                         >
-                          <img
+                          <OptimizedImage
                             src={img}
-                            alt={`${product.name} - ${index + 1}`}
-                            className="w-full h-full object-cover hover:opacity-90 transition-opacity"
+                            alt={getText(product.name)}
+                            className={`w-full h-full object-cover transition-opacity duration-300 ${
+                              isHovered ? "opacity-90" : "opacity-100"
+                            }`}
+                            quality={0.8}
                             loading="lazy"
                             width={150}
                             height={150}
@@ -555,31 +615,51 @@ const ProductCard: React.FC<ProductCardProps> = ({
                         <div className="flex space-x-2">
                           <button
                             onClick={() => shareProduct("facebook")}
-                            className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors"
+                            disabled={isSharing}
+                            className={`p-2 ${isSharing ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'} text-white rounded-full transition-colors flex items-center justify-center`}
                             aria-label={`${t.products.productDetails.shareOn} Facebook`}
                           >
-                            <Facebook className="w-5 h-5" />
+                            {isSharing ? (
+                              <Loader2 className="w-5 h-5 animate-spin" />
+                            ) : (
+                              <Facebook className="w-5 h-5" />
+                            )}
                           </button>
                           <button
                             onClick={() => shareProduct("twitter")}
-                            className="p-2 bg-sky-500 text-white rounded-full hover:bg-sky-600 transition-colors"
+                            disabled={isSharing}
+                            className={`p-2 ${isSharing ? 'bg-sky-400' : 'bg-sky-500 hover:bg-sky-600'} text-white rounded-full transition-colors flex items-center justify-center`}
                             aria-label={`${t.products.productDetails.shareOn} Twitter`}
                           >
-                            <Twitter className="w-5 h-5" />
+                            {isSharing ? (
+                              <Loader2 className="w-5 h-5 animate-spin" />
+                            ) : (
+                              <Twitter className="w-5 h-5" />
+                            )}
                           </button>
                           <button
                             onClick={() => shareProduct("linkedin")}
-                            className="p-2 bg-blue-700 text-white rounded-full hover:bg-blue-800 transition-colors"
+                            disabled={isSharing}
+                            className={`p-2 ${isSharing ? 'bg-blue-600' : 'bg-blue-700 hover:bg-blue-800'} text-white rounded-full transition-colors flex items-center justify-center`}
                             aria-label={`${t.products.productDetails.shareOn} LinkedIn`}
                           >
-                            <Linkedin className="w-5 h-5" />
+                            {isSharing ? (
+                              <Loader2 className="w-5 h-5 animate-spin" />
+                            ) : (
+                              <Linkedin className="w-5 h-5" />
+                            )}
                           </button>
                           <button
                             onClick={() => shareProduct("copy")}
-                            className="p-2 bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300 transition-colors flex items-center justify-center"
+                            disabled={isSharing}
+                            className={`p-2 ${isSharing ? 'bg-gray-300' : 'bg-gray-200 hover:bg-gray-300'} text-gray-700 rounded-full transition-colors flex items-center justify-center`}
                             aria-label={t.products.productDetails.copyLink}
                           >
-                            <LinkIcon className="w-5 h-5" />
+                            {isSharing ? (
+                              <Loader2 className="w-5 h-5 animate-spin" />
+                            ) : (
+                              <LinkIcon className="w-5 h-5" />
+                            )}
                           </button>
                         </div>
                       </div>
